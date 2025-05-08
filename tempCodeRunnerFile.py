@@ -1,0 +1,1 @@
+runs/detect/train/weights/best.pt
