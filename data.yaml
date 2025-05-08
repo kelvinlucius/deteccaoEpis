@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 6
+names: ['1', 'Capacete', 'Detector_Tensao_Contato', 'Pessoa', 'Pessoa-Sem Capacete-', 'Vara_Manobra']
+
+roboflow:
+  workspace: object-detection-bd7zj
+  project: datasetaehon-v22-nyx0z
+  version: 1
+  license: CC BY 4.0
+  url: https://app.roboflow.com/object-detection-bd7zj/datasetaehon-v22-nyx0z/1
