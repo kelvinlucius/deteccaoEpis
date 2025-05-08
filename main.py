@@ -16,8 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Carrega o modelo
-model = YOLO("yolov8n.pt")  # ou seu modelo customizado
+model = YOLO("runs/detect/train/weights/best.pt")
+classes = ['1', 'Capacete', 'Detector_Tensao_Contato', 'Pessoa', 'Pessoa-Sem Capacete-', 'Vara_Manobra']
 
 @app.post("/detectar/")
 async def detectar(file: UploadFile = File(...)):
@@ -26,7 +26,7 @@ async def detectar(file: UploadFile = File(...)):
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
     results = model(image)
-    nomes_classes = model.names
-    detectados = [nomes_classes[int(cls)] for cls in results[0].boxes.cls]
+    detectados = [classes[int(cls)] for cls in results[0].boxes.cls]
 
     return JSONResponse(content={"detectados": detectados})
+
