@@ -1,27 +1,32 @@
-import cv2
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
+import numpy as np
+import cv2
 
-# Carrega o modelo YOLOv8 (pode usar um customizado depois)
-model = YOLO('yolov8n.pt')  # Modelo leve padrão
+app = FastAPI()
 
-# Abre a webcam
-cap = cv2.VideoCapture(0)
+# Permitir CORS (Kotlin app pode consumir)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # depois pode restringir
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+# Carrega o modelo
+model = YOLO("yolov8n.pt")  # ou seu modelo customizado
 
-    # Detecção
-    results = model(frame)
+@app.post("/detectar/")
+async def detectar(file: UploadFile = File(...)):
+    contents = await file.read()
+    nparr = np.frombuffer(contents, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    # Exibir com boxes desenhados
-    annotated_frame = results[0].plot()
-    cv2.imshow("Detecção de EPIs", annotated_frame)
+    results = model(image)
+    nomes_classes = model.names
+    detectados = [nomes_classes[int(cls)] for cls in results[0].boxes.cls]
 
-    # Tecla 'q' para sair
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+    return JSONResponse(content={"detectados": detectados})
