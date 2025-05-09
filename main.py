@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
 import numpy as np
 import cv2
+import os
+
+
+
 
 app = FastAPI()
 
